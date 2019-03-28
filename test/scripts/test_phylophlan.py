@@ -7,14 +7,14 @@ import os
 import errno
 
 if len(sys.argv) == 1:
-	print "Please provide a filename"
+	print("Please provide a filename")
 	sys.exit()
 
 # phylophlan dir
 phydir = sys.argv[1]
 
 if not os.path.exists(phydir) or not os.path.isdir(phydir):
-	print phydir + " does not exist or isn't a directory"
+	print(phydir + " does not exist or isn't a directory")
 	sys.exit()	
 
 # output file
@@ -69,9 +69,9 @@ except OSError as o:
 	f.close()
 	sys.exit()
 except:
- 	f.write('Unexpected error: unable to run phylophlan' + '\n')
-	f.close()
-	sys.exit()
+    f.write('Unexpected error: unable to run phylophlan' + '\n')
+    f.close()
+    sys.exit()
 
 # if we're still here, check error and print
 if error == '':

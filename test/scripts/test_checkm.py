@@ -7,7 +7,7 @@ import os
 import errno
 
 if len(sys.argv) == 1:
-	print "Please provide a filename"
+	print("Please provide a filename")
 	sys.exit()
 
 # output file
@@ -36,9 +36,9 @@ except OSError as o:
 	f.close()
 	sys.exit()
 except:
- 	f.write('Unexpected error: unable to run checkM' + '\n')
-	f.close()
-	sys.exit()
+    f.write('Unexpected error: unable to run checkM' + '\n')
+    f.close()
+    sys.exit()
 
 # if we're still here, check error and print
 if error == '':
