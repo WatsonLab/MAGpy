@@ -87,6 +87,7 @@ cd ..
 ```
 python MAGpy/scripts/update_ete3.py
 ```
+NB there is currently an issue with ete3, see https://github.com/etetoolkit/ete/issues/469
 
 ### 8 install phylophlan
 ```
