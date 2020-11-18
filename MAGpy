@@ -1,5 +1,7 @@
 shell.executable("/bin/bash")
-shell.prefix("source $HOME/.bashrc; ")
+
+from snakemake.utils import min_version
+min_version("5.0")
 
 import os
 
@@ -181,8 +183,12 @@ rule test:
 rule test_checkm:
 	output: "test/outputs/checkm.txt"
 	conda: "envs/checkm.yaml"
+	params:
+		cdr=config["checkm_dataroot"]
 	shell:
 		'''
+		checkm_db={params.cdr}
+		echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
 		test/scripts/test_checkm.py {output}	
 		'''	
 

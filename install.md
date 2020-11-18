@@ -7,7 +7,7 @@
 ### 1 Update ubuntu
 ```sh
 sudo apt-get update
-sudo apt install gcc g++ make
+sudo apt install gcc g++ make wget git
 ```
 
 ### 2 install usearch 
@@ -33,7 +33,7 @@ sh Miniconda3-latest-Linux-x86_64.sh
 # review license
 # accept license
 # accept or change home location
-# yes to placing it in your path
+# yes to running conda init to place it in your path
 
 # source .bashrc
 source $HOME/.bashrc
@@ -52,7 +52,7 @@ git clone https://github.com/WatsonLab/MAGpy.git
 conda env create -f MAGpy/envs/install.yaml
 
 # activate it
-source activate magpy_install
+conda activate magpy_install
 ```
 
 ### 6 download data and build indices
@@ -125,8 +125,6 @@ source activate basic2
 
 /usr/bin/env perl -MCPAN -e 'install Color::Mix'
 # answer yes to automatic config
-# answer a to all
-# answer n to XML additional tools
 ```
 
 

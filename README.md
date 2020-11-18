@@ -41,7 +41,7 @@ cd MAGpy
 Run the tests:
 
 ```sh
-snakemake --use-conda -s MAGpy test
+snakemake --use-conda -s MAGpy --cores 1 test
 ```
 
 Test outputs will be in ```test/outputs``` and you should have an ```error_log``` file in your current working directory.
@@ -61,10 +61,10 @@ Edit the config.json and point to the databases and directories created during t
 
 In this directory, put all of your genomes into the mags folder, one file per genome, with a .fa file extension
 
-Then to run in basic (linear, non-cluster) mode:
+Then to run in basic (linear, non-cluster) mode, where `$N` is the number of parallel threads you want to use:
 
 ```
-snakemake --use-conda -s MAGpy
+snakemake --use-conda -s MAGpy --cores $N
 ```
 
 Outputs will be placed into the *current working directory*, so make sure you have write access.
