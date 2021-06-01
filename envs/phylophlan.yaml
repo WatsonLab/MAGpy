@@ -1,0 +1,8 @@
+name: phylophlan
+channels:
+    - anaconda
+    - bioconda
+    - conda-forge
+    - defaults
+dependencies:
+    - phylophlan=3.0.2

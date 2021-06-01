@@ -4,4 +4,4 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - diamond=0.9.22
+  - diamond=2.0.9

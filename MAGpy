@@ -10,7 +10,7 @@ configfile: "config.json"
 IDS, = glob_wildcards("mags/{id}.fa")
 
 rule all:
-	 input: "sourmash_report.csv", "diamond_bin_report_plus.tsv", expand("pfam/{sample}.pfam", sample=IDS), expand("sourmash/{sample}.sm", sample=IDS), expand("diamond_report/bin.{sample}.tsv", sample=IDS), "checkm_plus.txt", "tree/MAGpy/MAGpy.tree.nwk"
+	 input: "sourmash_report.csv", directory("phylophlan_out"), "diamond_bin_report_plus.tsv", expand("pfam/{sample}.pfam", sample=IDS), expand("diamond_report/bin.{sample}.tsv", sample=IDS), "checkm_plus.txt"
 
 rule checkm:
 	input: "mags"
@@ -33,16 +33,18 @@ rule checkm_plus:
 	conda: "envs/ete3.yaml"
 	shell: "scripts/add_tax.py {input} > {output}"
 
+
 rule prodigal:
-	input: 'mags/{id}.fa'
+	input: "mags/{id}.fa"
 	output: 
 		faa='proteins/{id}.faa',
 		gff='proteins/{id}_prodigal.gff'
 	conda: "envs/prodigal.yaml"
 	shell: 'prodigal -p meta -a {output.faa} -q -i {input} -f gff -o {output.gff}'
 
+
 rule diamond:
-        input: 'proteins/{id}.faa'
+        input: "proteins/{id}.faa"
         output: 'diamond/{id}.diamond.tsv'
         threads: 16
         params:
@@ -50,6 +52,7 @@ rule diamond:
                 of="6 qseqid sseqid stitle pident qlen slen length mismatch gapopen qstart qend sstart send evalue bitscore"
         conda: "envs/diamond.yaml"
 	shell: "diamond blastp --threads {threads} --max-target-seqs 10 --db {params.db} --query {input} --outfmt {params.of} --out {output}"
+
 
 rule diamond_report:
 	input: 
@@ -60,6 +63,7 @@ rule diamond_report:
 		outdir="diamond_report"
 	conda: "envs/bioperl.yaml"
 	shell: "scripts/diamond_report.pl {input.tsv} {input.faa} {params.outdir}"
+
 
 rule diamond_bin_summary:
         input: expand("diamond_report/bin.{sample}.tsv", sample=IDS)
@@ -79,25 +83,45 @@ rule diamond_bin_summary_plus:
 
 
 rule sourmash_sig:
-        input: 'mags/{id}.fa'
-        output: 'sourmash/{id}.sig'
+	input: 'mags/{id}.fa'
+	output: 
+		k21='sourmash/{id}.21.sig',
+		k31='sourmash/{id}.31.sig',
+		k51='sourmash/{id}.51.sig'
 	conda: "envs/sourmash.yaml"
-        shell: "sourmash compute --scaled 1000 -k 31 -o {output} {input}"
+	shell: 
+		'''
+		sourmash compute --scaled 10000 -k 21 -o {output.k21} {input}
+		sourmash compute --scaled 10000 -k 31 -o {output.k31} {input}
+		sourmash compute --scaled 10000 -k 51 -o {output.k51} {input}
+		'''
 
-rule sourmash_gather:
-        input: 'sourmash/{id}.sig'
-        output:
-                csv='sourmash/{id}.csv',
-                out='sourmash/{id}.sm'
+rule sourmash_lca:
+	input: 
+		k21='sourmash/{id}.21.sig',
+		k31='sourmash/{id}.31.sig',
+		k51='sourmash/{id}.51.sig'
+	output:
+                k21='sourmash/{id}.21.csv',
+		k31='sourmash/{id}.31.csv',
+		k51='sourmash/{id}.51.csv'
 	params:
-		gb=config["sourmash_gbk"]
+		gb21=config["sourmash_gbk_k21"],
+		gb31=config["sourmash_gbk_k31"],
+		gb51=config["sourmash_gbk_k51"]
 	conda: "envs/sourmash.yaml"
-	shell: "sourmash gather -k 31 {input} {params.gb} -o {output.csv} > {output.out}"
+	shell:
+		'''
+		sourmash lca classify --query {input.k21} --db {params.gb21} -o {output.k21}
+		sourmash lca classify --query {input.k31} --db {params.gb31} -o {output.k31}
+		sourmash lca classify --query {input.k51} --db {params.gb51} -o {output.k51}
+		'''
 
 rule sourmash_report:
-	input: expand("sourmash/{sample}.csv", sample=IDS)
+	input: expand("sourmash/{sample}.21.csv", sample=IDS), expand("sourmash/{sample}.31.csv", sample=IDS), expand("sourmash/{sample}.51.csv", sample=IDS)
 	output: 'sourmash_report.csv'
-	shell: "echo 'intersect_bp,f_orig_query,f_match,f_unique_to_query,f_unique_weighted,average_abund,median_abund,std_abund,name,filename,md5' >> {output} && scripts/sourmash_report.pl {input} >> {output}"
+	shell: "echo 'ID,status,superkingdom,phylum,class,order,family,genus,species,strain' >> {output} && cat {input} | grep -v superkingdom >> {output}"
+
 
 rule pfam_scan:
 	input: 'proteins/{id}.faa'
@@ -106,33 +130,19 @@ rule pfam_scan:
 	params:
 		pfam=config["pfam_dir"]
 	conda: "envs/pfam_scan.yaml"
-	shell: "pfam_scan.pl -outfile {output} -as -cpu {threads} -fasta {input} -dir {params.pfam}"
+	shell: "pfam_scan.pl -outfile {output} -cpu {threads} -fasta {input} -dir {params.pfam}"
 
-rule phylophlan_link:
+
+rule phylophlan:
 	input: expand("proteins/{sample}.faa", sample=IDS)
-	output: "tree/MAGpy/MAGpy.tree.nwk"
+	output: directory("phylophlan_out")
 	threads: 16
-	conda: "envs/basic2.yaml"
-	params:
-		pdir=config["phylophlan_dir"],
-		unn=os.getpid()
+	conda: "envs/phylophlan.yaml"
 	shell: 
 		'''
-		CWD=`pwd`
-		mkdir {params.pdir}/input/{params.unn}
-		cp proteins/*.faa {params.pdir}/input/{params.unn}
-		cd {params.pdir}
-		./phylophlan.py -u {params.unn} --nproc {threads}
-		mkdir -p $CWD/tree/MAGpy
-		mv ./output/{params.unn}/*.nwk $CWD/tree/MAGpy/MAGpy.tree.nwk
-		mv ./output/{params.unn}/*.xml $CWD/tree/MAGpy/MAGpy.tree.xml
-		./phylophlan.py -i -t {params.unn} --nproc {threads}
-		mv ./output/{params.unn}/*.nwk $CWD/tree/MAGpy/MAGpy.treeoflife.nwk
-		mv ./output/{params.unn}/*.txt $CWD/tree/MAGpy/
-		cd $CWD
-		rm -rf {params.pdir}/input/{params.unn}
-		rm -rf {params.pdir}/data/{params.unn}
-		rm -rf {params.pdir}/output/{params.unn}/
+		phylophlan_write_default_configs.sh phylophlan_configs
+		
+		phylophlan -i proteins -o {output} -d phylophlan -t a -f phylophlan_configs/supermatrix_aa.cfg --nproc 8 --diversity low --fast --verbose 
 		'''
 
 ##########################################
@@ -157,11 +167,58 @@ rule clean:
 		rm -f sourmash_report.csv
 		rm -f diamond_bin_report_plus.tsv
 		rm -rf pfam
-		rm -rf tree
+		rm -rf phylophlan_*
 		rm -rf test/outputs
 		rm -rf test_results.txt
+		rm -rf ete3.done 
+		rm -rf taxdump.tar.gz
 		'''
 
+##########################################
+#
+#
+#   setup databases
+#
+#
+##########################################
+
+
+rule setup:
+	output: directory("magpy_dbs")
+	conda: "envs/setup.yaml"
+	shell:
+		'''
+		mkdir -p {output} && cd {output}
+
+		wget -q ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
+		diamond makedb --threads 4 --in uniprot_sprot.fasta.gz -d uniprot_sprot
+		rm uniprot_sprot.fasta.gz
+
+		# Sourmash
+		wget -O genbank-k21.lca.json.gz -q https://osf.io/d7rv8/download
+		wget -O genbank-k31.lca.json.gz -q https://osf.io/4f8n3/download
+		wget -O genbank-k51.lca.json.gz -q https://osf.io/nemkw/download
+
+		# Pfam
+		wget -q ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
+		wget -q ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.dat.gz
+		#wget -q ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/active_site.dat.gz
+		gunzip Pfam-A.hmm.gz Pfam-A.hmm.dat.gz #active_site.dat.gz
+		hmmpress Pfam-A.hmm
+
+
+		# get checkM data
+		mkdir checkm_data
+		cd checkm_data
+		wget -q https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz
+		gunzip < checkm_data_2015_01_16.tar.gz | tar xvf -
+		cd ..
+
+		cd ..
+
+		echo '{{"uniprot_sprot": "magpy_dbs/uniprot_sprot.dmnd","sourmash_gbk_k21": "magpy_dbs/genbank-k21.lca.json.gz","sourmash_gbk_k31": "magpy_dbs/genbank-k31.lca.json.gz","sourmash_gbk_k51": "magpy_dbs/genbank-k51.lca.json.gz","pfam_dir": "magpy_dbs","checkm_dataroot": "magpy_dbs/checkm_data"}}' > config.json
+
+		'''
 
 ##########################################
 #
@@ -172,7 +229,7 @@ rule clean:
 ##########################################
 
 rule test:
-	input: "test/outputs/checkm.txt", "test/outputs/checkm_plus.txt", "test/outputs/diamond.txt", "test/outputs/diamond_report.txt", "test/outputs/diamond_bin_summary.txt", "test/outputs/prodigal.txt", "test/outputs/sourmash.txt", "test/outputs/phylophlan.txt"
+	input: "test/outputs/pfam_scan.txt", "test/outputs/checkm.txt", "test/outputs/checkm_plus.txt", "test/outputs/diamond.txt", "test/outputs/diamond_report.txt", "test/outputs/diamond_bin_summary.txt", "test/outputs/prodigal.txt", "test/outputs/sourmash.txt", "test/outputs/phylophlan.txt"
 	output: "test_results.txt"
 	shell:
 		'''
@@ -187,12 +244,20 @@ rule test_checkm:
 		cdr=config["checkm_dataroot"]
 	shell:
 		'''
-		checkm_db={params.cdr}
-		echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
 		test/scripts/test_checkm.py {output}	
 		'''	
 
+rule test_update_ete3:
+	output: "ete3.done"
+	conda: "envs/ete3.yaml"
+	shell:
+		'''
+		./scripts/update_ete3.py && touch {output}
+		'''
+
+
 rule test_checkm_plus:
+	input: "ete3.done"
 	output: "test/outputs/checkm_plus.txt"
 	conda: "envs/ete3.yaml"
 	shell:
@@ -205,8 +270,8 @@ rule test_diamond:
 	conda: "envs/diamond.yaml"
 	shell:
 		'''
-                test/scripts/test_diamond.py {output}
-                '''
+		test/scripts/test_diamond.py {output}
+ 		'''
 
 rule test_diamond_report:
 	output: "test/outputs/diamond_report.txt"
@@ -217,6 +282,7 @@ rule test_diamond_report:
 		'''
 
 rule test_diamond_bin_summary_plus:
+	input: "ete3.done"
 	output: "test/outputs/diamond_bin_summary.txt"
 	conda: "envs/ete3.yaml"
 	shell:
@@ -243,10 +309,16 @@ rule test_sourmash:
 
 rule test_phylophlan:
 	output: "test/outputs/phylophlan.txt"
-	conda: "envs/basic2.yaml"
-	params:
-		pdir=config["phylophlan_dir"]
+	conda: "envs/phylophlan.yaml"
 	shell:
 		'''
-		test/scripts/test_phylophlan.py {params.pdir} {output}
+		test/scripts/test_phylophlan.py {output}
+		'''
+
+rule test_pfam_scan:
+	output: "test/outputs/pfam_scan.txt"
+	conda: "envs/pfam_scan.yaml"
+	shell:
+		'''
+		test/scripts/test_pfam_scan.py {output}
 		'''

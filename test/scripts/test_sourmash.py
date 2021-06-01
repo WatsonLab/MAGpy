@@ -41,7 +41,7 @@ except:
 	sys.exit()
 
 # if we're still here, check error and print
-if error.decode(sys.stdout.encoding) == '':
+if error.decode(sys.stdout.encoding) == '== This is sourmash version 4.1.1. ==':
 	f.write('Sourmash ran without problems' + '\n')
 else :
 	f.write('Sourmash ran with some errors: ' + error.decode(sys.stdout.encoding) + '\n')
