@@ -240,10 +240,12 @@ rule test:
 rule test_checkm:
 	output: "test/outputs/checkm.txt"
 	conda: "envs/checkm.yaml"
-	params:
+	params: 
 		cdr=config["checkm_dataroot"]
-	shell:
+	shell: 
 		'''
+		checkm_db={params.cdr}
+		echo ${{checkm_db}} | checkm data setRoot ${{checkm_db}}
 		test/scripts/test_checkm.py {output}	
 		'''	
 
