@@ -1,48 +1,41 @@
 {
-    "__default__" :
-    {
+    "__default__" : {
         "core" : "1",
         "time" : "01:00:00",
         "vmem" : "4G",
         "proj" : "myqueue"
     },
-    "diamond" :
-    {
+    "diamond" : {
         "core" : "16",
         "time" : "24:00:00",
         "vmem" : "16G",
         "proj" : "myqueue"
     },
-    "checkm" :
-    {
+    "checkm" : {
         "core" : "16",
         "time" : "24:00:00",
         "vmem" : "16G",
         "proj" : "myqueue"
     },
-    "phylophlan_link" :
-    {
+    "phylophlan_link" : {
         "core" : "16",
         "time" : "08:00:00",
         "vmem" : "16G",
         "proj" : "myqueue"
     },
-    "pfam_scan" :
-    {
+    "pfam_scan" : {
         "core" : "4",
         "time" : "12:00:00",
         "vmem" : "4G",
         "proj" : "myqueue"
     },
-    "sourmash_sig" :
-    {
+    "sourmash_sig" : {
         "core" : "1",
         "time" : "08:00:00",
         "vmem" : "4G",
         "proj" : "myqueue"
     },
-    "sourmash_gather" :
-    {
+    "sourmash_gather" : {
         "core" : "1",
         "time" : "12:00:00",
         "vmem" : "4G",
