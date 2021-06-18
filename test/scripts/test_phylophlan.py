@@ -7,8 +7,8 @@ import os
 import errno
 
 if len(sys.argv) == 1:
-	print("Please provide a filename")
-	sys.exit()
+    print("Please provide a filename")
+    sys.exit()
 
 # output file
 outfile = sys.argv[1]
@@ -44,10 +44,7 @@ except:
 # if we're still here, check error and print
 if error == '':
     f.write('phylophlan ran without problems' + '\n')
-else :
+else:
     f.write('phylophlan ran with some errors: ' + str(error) + '\n')
 	
-
 f.close()
-
-
