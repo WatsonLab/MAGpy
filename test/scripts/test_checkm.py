@@ -19,7 +19,7 @@ if not os.path.dirname(outfile) == '':
             os.makedirs(os.path.dirname(outfile))
         except OSError as exc: # Guard against race condition
             if exc.errno != errno.EEXIST:
-            raise
+                raise
 
 f = open(outfile, 'w+')
 
