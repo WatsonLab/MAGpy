@@ -45,7 +45,7 @@ titles = [
     "genus"
 ]
 
-print('\t'.join(map(str,titles)))
+print('\t'.join(map(str, titles)))
 
 # iterate over file
 for row in checkm_file:
@@ -94,24 +94,24 @@ for row in checkm_file:
                 if rank[l] == 'kingdom':
 		            k = names[l]
 
-				if rank[l] == 'phylum':
+                if rank[l] == 'phylum':
                     p = names[l]
 
-				if rank[l] == 'class':
+                if rank[l] == 'class':
                     c = names[l]
 
-				if rank[l] == 'order':
+                if rank[l] == 'order':
                     o = names[l]
 
-				if rank[l] == 'family':
+                if rank[l] == 'family':
                     f = names[l]
 
-				if rank[l] == 'genus':
-                    g = names[l]	
-			
+                if rank[l] == 'genus':
+                    g = names[l]
+
         # print it all out
-        print('\t'.join(map(str,arr)),'\t',end='')
-        print("%s\t%s\t%s\t%s\t%s\t%s\t%s" % (sk,k,p,c,o,f,g))
+        print('\t'.join(map(str, arr)), '\t', end='')
+        print("%s\t%s\t%s\t%s\t%s\t%s\t%s" % (sk, k, p, c, o, f, g))
 
 # close file
 checkm_file.close()
