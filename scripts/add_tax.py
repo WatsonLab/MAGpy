@@ -94,19 +94,19 @@ for row in checkm_file:
                 if rank[l] == 'kingdom':
 		            k = names[l]
 
-				if rank[l] == 'phylum':
+                if rank[l] == 'phylum':
                     p = names[l]
 
-				if rank[l] == 'class':
+                if rank[l] == 'class':
                     c = names[l]
 
-				if rank[l] == 'order':
+                if rank[l] == 'order':
                     o = names[l]
 
-				if rank[l] == 'family':
+                if rank[l] == 'family':
                     f = names[l]
 
-				if rank[l] == 'genus':
+                if rank[l] == 'genus':
                     g = names[l]	
 			
         # print it all out
