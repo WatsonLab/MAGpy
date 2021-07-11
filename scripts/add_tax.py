@@ -65,12 +65,12 @@ for row in checkm_file:
 
         # empty variables unless we change them
         sk = ''
-        k  = ''
-        p  = ''
-        c  = ''
-        o  = ''
-        f  = ''
-        g  = ''
+        k = ''
+        p = ''
+        c = ''
+        o = ''
+        f = ''
+        g = ''
 
         # check we got what we asked for
         if tax in name2taxid.keys():
