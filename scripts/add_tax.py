@@ -45,7 +45,7 @@ titles = [
     "genus"
 ]
 
-print('\t'.join(map(str,titles)))
+print('\t'.join(map(str, titles)))
 
 # iterate over file
 for row in checkm_file:
@@ -53,9 +53,9 @@ for row in checkm_file:
     arr = row.split()
 
     # only consider data lines
-    if (len(arr) > 1):	
+    if len(arr) > 1:
         # get taxonomy free of the k__ bit	
-        if (arr[1] == "root"):
+        if arr[1] == "root":
             tax = "root"
         else:
             tax = arr[1].split("__")[1]
@@ -65,12 +65,12 @@ for row in checkm_file:
 
         # empty variables unless we change them
         sk = ''
-        k  = ''
-        p  = ''
-        c  = ''
-        o  = ''
-        f  = ''
-        g  = ''
+        k = ''
+        p = ''
+        c = ''
+        o = ''
+        f = ''
+        g = ''
 
         # check we got what we asked for
         if tax in name2taxid.keys():
@@ -92,26 +92,26 @@ for row in checkm_file:
                     sk = names[l]
 
                 if rank[l] == 'kingdom':
-		            k = names[l]
+                    k = names[l]
 
-				if rank[l] == 'phylum':
+                if rank[l] == 'phylum':
                     p = names[l]
 
-				if rank[l] == 'class':
+                if rank[l] == 'class':
                     c = names[l]
 
-				if rank[l] == 'order':
+                if rank[l] == 'order':
                     o = names[l]
 
-				if rank[l] == 'family':
+                if rank[l] == 'family':
                     f = names[l]
 
-				if rank[l] == 'genus':
+                if rank[l] == 'genus':
                     g = names[l]	
-			
+
         # print it all out
-        print('\t'.join(map(str,arr)),'\t',end='')
-        print("%s\t%s\t%s\t%s\t%s\t%s\t%s" % (sk,k,p,c,o,f,g))
+        print('\t'.join(map(str, arr)), '\t', end='')
+        print("%s\t%s\t%s\t%s\t%s\t%s\t%s" % (sk, k, p, c, o, f, g))
 
 # close file
 checkm_file.close()
