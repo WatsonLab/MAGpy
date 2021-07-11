@@ -53,9 +53,9 @@ for row in checkm_file:
     arr = row.split()
 
     # only consider data lines
-    if (len(arr) > 1):	
+    if len(arr) > 1:
         # get taxonomy free of the k__ bit	
-        if (arr[1] == "root"):
+        if arr[1] == "root":
             tax = "root"
         else:
             tax = arr[1].split("__")[1]
