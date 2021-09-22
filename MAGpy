@@ -10,7 +10,7 @@ configfile: "config.json"
 IDS, = glob_wildcards("mags/{id}.fa")
 
 rule all:
-	 input: "sourmash_report.csv", directory("phylophlan_out"), "diamond_bin_report_plus.tsv", expand("pfam/{sample}.pfam", sample=IDS), expand("diamond_report/bin.{sample}.tsv", sample=IDS), "checkm_plus.txt"
+	 input: "sourmash_report.csv", "phylophlan_out", "diamond_bin_report_plus.tsv", expand("pfam/{sample}.pfam", sample=IDS), expand("diamond_report/bin.{sample}.tsv", sample=IDS), "checkm_plus.txt"
 
 rule checkm:
 	input: "mags"
