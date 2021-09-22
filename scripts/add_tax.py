@@ -86,7 +86,7 @@ for row in checkm_file:
             # iterate up the lineage mapping names
             # to each of our variables
             for l in lineage:
-                rank = ncbi.get_rank([l])
+		rank = ncbi.get_rank([l])
 
 		if rank[l] == 'superkingdom':
 			sk = names[l]
