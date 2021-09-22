@@ -88,10 +88,10 @@ for row in checkm_file:
             for l in lineage:
                 rank = ncbi.get_rank([l])
 
-                if rank[l] == 'superkingdom':
-                    sk = names[l]
+		if rank[l] == 'superkingdom':
+			sk = names[l]
 
-                if rank[l] == 'kingdom':
+		if rank[l] == 'kingdom':
 			k = names[l]
 
 		if rank[l] == 'phylum':
@@ -102,10 +102,10 @@ for row in checkm_file:
 
 		if rank[l] == 'order':
 			o = names[l]
-
+		
 		if rank[l] == 'family':
 			f = names[l]
-
+		
 		if rank[l] == 'genus':
 			g = names[l]	
 			
