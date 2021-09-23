@@ -51,6 +51,7 @@ snakemake -rp -s MAGpy --cores 1 --use-conda test
 This will build a DIAMOND database of the whole of UniProt TREMBL, so you will need to give it a lot of resources (RAM) - try 256Gb.
 
 ```
+rm -rf magpy_dbs
 snakemake -rp -s MAGpy --cores 16 --use-conda setup
 ```
 
