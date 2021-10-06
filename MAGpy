@@ -182,41 +182,73 @@ rule clean:
 #
 ##########################################
 
-
-rule setup:
-	output: directory("magpy_dbs")
+rule setup_uniprot:
+	output: "magpy_dbs/uniprot_trembl.dmnd"
 	conda: "envs/setup.yaml"
+	params:
+		dir="magpy_dbs"
+	threads: 4
 	shell:
 		'''
-		mkdir -p {output} && cd {output}
-
-		wget -q ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.fasta.gz
-		diamond makedb --threads 4 --in uniprot_trembl.fasta.gz -d uniprot_trembl
+		mkdir -p {params.dir} && cd {params.dir}
+		wget --no-check-certificate ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_trembl.fasta.gz
+		diamond makedb --threads {threads} --in uniprot_trembl.fasta.gz -d uniprot_trembl
 		rm uniprot_trembl.fasta.gz
+		'''
 
-		# Sourmash
-		wget -O genbank-k21.lca.json.gz -q https://osf.io/d7rv8/download
-		wget -O genbank-k31.lca.json.gz -q https://osf.io/4f8n3/download
-		wget -O genbank-k51.lca.json.gz -q https://osf.io/nemkw/download
+rule setup_sourmash:
+	output: "magpy_dbs/genbank-k21.lca.json.gz","magpy_dbs/genbank-k31.lca.json.gz","magpy_dbs/genbank-k51.lca.json.gz"
+	conda: "envs/setup.yaml"
+	params:
+		dir="magpy_dbs"
+	shell:
+		'''
+		mkdir -p {params.dir} && cd {params.dir}
 
-		# Pfam
+		wget --no-check-certificate -O genbank-k21.lca.json.gz https://osf.io/d7rv8/download
+		wget --no-check-certificate -O genbank-k31.lca.json.gz https://osf.io/4f8n3/download
+		wget --no-check-certificate -O genbank-k51.lca.json.gz https://osf.io/nemkw/download
+		'''
+
+rule setup_pfam:
+	output: "magpy_dbs/Pfam-A.hmm"
+	conda: "envs/setup.yaml"
+	params:
+		dir="magpy_dbs"
+	shell:
+		'''
+		mkdir -p {params.dir} && cd {params.dir}
 		wget -q ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
 		wget -q ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.dat.gz
 		#wget -q ftp://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/active_site.dat.gz
 		gunzip Pfam-A.hmm.gz Pfam-A.hmm.dat.gz #active_site.dat.gz
 		hmmpress Pfam-A.hmm
 
+		'''
 
+
+rule setup_checkm:
+	output: "magpy_dbs/checkm_data/taxon_marker_sets.tsv"
+	conda: "envs/setup.yaml"
+	params:
+		dir="magpy_dbs"
+	shell:
+		'''
+		mkdir -p {params.dir} && cd {params.dir}
 		# get checkM data
 		mkdir checkm_data
 		cd checkm_data
 		wget -q https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz
 		gunzip < checkm_data_2015_01_16.tar.gz | tar xvf -
-		cd ..
+		'''
 
-		cd ..
-
-		echo '{{"uniprot_sprot": "magpy_dbs/uniprot_trembl.dmnd","sourmash_gbk_k21": "magpy_dbs/genbank-k21.lca.json.gz","sourmash_gbk_k31": "magpy_dbs/genbank-k31.lca.json.gz","sourmash_gbk_k51": "magpy_dbs/genbank-k51.lca.json.gz","pfam_dir": "magpy_dbs","checkm_dataroot": "magpy_dbs/checkm_data"}}' > config.json
+rule setup:
+	input: "magpy_dbs/checkm_data/taxon_marker_sets.tsv", "magpy_dbs/Pfam-A.hmm", "magpy_dbs/genbank-k21.lca.json.gz","magpy_dbs/genbank-k31.lca.json.gz","magpy_dbs/genbank-k51.lca.json.gz", "magpy_dbs/uniprot_trembl.dmnd"
+	output: "setup.done"
+	conda: "envs/setup.yaml"
+	shell:
+		'''
+		echo '{{"uniprot_sprot": "magpy_dbs/uniprot_trembl.dmnd","sourmash_gbk_k21": "magpy_dbs/genbank-k21.lca.json.gz","sourmash_gbk_k31": "magpy_dbs/genbank-k31.lca.json.gz","sourmash_gbk_k51": "magpy_dbs/genbank-k51.lca.json.gz","pfam_dir": "magpy_dbs","checkm_dataroot": "magpy_dbs/checkm_data"}}' > config.json && touch {output}
 
 		'''
 
