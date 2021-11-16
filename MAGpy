@@ -236,6 +236,7 @@ rule setup_checkm:
 		'''
 		mkdir -p {params.dir} && cd {params.dir}
 		# get checkM data
+		rm -rf checkm_data
 		mkdir -p checkm_data
 		cd checkm_data
 		wget -q https://data.ace.uq.edu.au/public/CheckM_databases/checkm_data_2015_01_16.tar.gz
