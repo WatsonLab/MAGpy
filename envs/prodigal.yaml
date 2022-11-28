@@ -5,3 +5,4 @@ channels:
   - defaults
 dependencies:
   - prodigal=2.6.3
+  - python>=3
