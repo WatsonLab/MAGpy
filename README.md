@@ -58,7 +58,7 @@ snakemake -rp -s MAGpy --cores 16 --use-conda setup
 ## Run MAGpy
 
 ```
-snakemake -rp -s MAGpy --use-conda MAGpy
+snakemake -rp -s MAGpy --use-conda --cores 8
 ```
 
 For large workflows, I recommend you use [cluster](https://snakemake.readthedocs.io/en/stable/executing/cluster.html) or [cloud](https://snakemake.readthedocs.io/en/stable/executing/cloud.html) execution.
