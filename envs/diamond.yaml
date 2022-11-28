@@ -5,3 +5,4 @@ channels:
   - defaults
 dependencies:
   - diamond=2.0.9
+  - python>=3
