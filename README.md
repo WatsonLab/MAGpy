@@ -38,6 +38,7 @@ Skip if you already have them
 
 ```sh
 conda env create -f envs/install.yaml 
+conda activate magpy_install
 ```
 
 ## Run tests and install conda envs:
